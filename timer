@@ -1,0 +1,159 @@
+/*
+* Program Name: clock
+* Date: May 22 2022
+* Author:Erik Bailey
+*/
+
+#include <iostream>
+#include <stdio.h>      /* puts, printf */
+#include <iomanip>
+#include <string>
+using namespace std;
+int hours = 0;//hours set at 0
+int minutes = 0;//minutes set at 0
+int seconds = 0;//seconds set at 0
+int go=1;//used to tell when the program should stop when set to 0 loop ends
+void mainMenu();//gotta make sure to let the main know that this exists
+unsigned int getMenuChoice(unsigned int maxChoice);//gotta make sure to let the main know that this exists
+void displayClocks(unsigned int h, unsigned int m, unsigned int s);//gotta make sure to let the main know that this exists
+void addOneHour();//gotta make sure to let the main know that this exists
+void addOneMinute();//gotta make sure to let the main know that this exists
+void addOneSecond();//gotta make sure to let the main know that this exists
+void printMenu(char* strings[], unsigned int numStrings, unsigned char width);
+
+int main() {
+	const char* strings[4] = { "Add One Hour", "Add One Minute", "Add One Second", "Exit Program" };//makes a char array to be used to display choices
+	printMenu((char**)strings, 4, 26);//diplays menu with choices
+	getMenuChoice(4);//gets the choice from user between one and 4 if 4 end program
+	while (go == 1) {//keeps going until go is assigned 0 which happens when 4 is the input
+		displayClocks(hours, minutes, seconds);//displays time in two formats
+		printMenu((char**)strings, 4, 26);//diplays menu with choices
+		mainMenu();//gets user choice and adds accordingly
+	}
+}
+string nCharString(size_t n, char c) {
+	string s = "";//string to be returned
+	for (int i = 0;i < n;i++) {//makes sure the right number of chars are put into s
+		s.append(1, c);//adds char to s
+	}
+	return s;//returns the string
+}
+void printMenu(char* strings[], unsigned int numStrings, unsigned char width) {
+	int w = (int)width;//converts width into an int
+	cout << nCharString(w, '*');// << "\n";//prints out * of w width
+	int a;//used to find the right amount of spaces 
+	int b;//used to find the right amount of spaces
+	int ia;//used to get right number printed in for loop
+	string s;
+	for (int i = 0;i < numStrings;i++) {//go through the loop until each string has been shown
+		cout << "\n";//next line
+		s = strings[i];//assign s to be the next string in the array
+		a = s.size();//takes into account string size
+		b = w - a;//subtract for the size of string
+		b = b - 7;//subtract the rest of the characters already used such as *
+		ia = i + 1;//adjust the number as the for loop started with 0
+		cout << "* " << ia << " - " << s;//prints line of menu
+		cout << nCharString(b, ' ') << "*" << "\n";//prints spaces to make it look good
+	}
+	cout << nCharString(w, '*');//finish the menu border
+}
+string twoDigitString(unsigned int n) {
+	std::string s = std::to_string(n);//int to string
+	if (s.size() == 1) {//if single digit 
+		s = "0" + s;//adds 0 before number
+	}
+	return s.substr(0, 2);//return double digit
+}
+string formatTime24(unsigned int h, unsigned int m, unsigned int s) {
+	h = h % 24;//make sure time doesn't go overboard
+	m = m % 60;//make sure time doesn't go overboard
+	s = s % 60;//make sure time doesn't go overboard
+	string hr = twoDigitString(h);//makes sure it is read in two digits
+	string min = twoDigitString(m);//makes sure it is read in two digits
+	string sec = twoDigitString(s);//makes sure it is read in two digits
+	string all = hr + ":" + min + ":" + sec;//put time into a string together
+	return all;	// return time as hh:mm:ss
+}
+string formatTime12(unsigned int h, unsigned int m, unsigned int s) {
+	h = h % 24;//make sure time doesn't go overboard
+	string tim = "";
+	if (h >= 12) {//tell if am or pm 
+		tim = " P M";
+	}
+	else {
+		tim = " A M";
+	}
+	h = h % 12;//make sure time doesn't go overboard
+	if (h == 0) {//12 hour time is 1 through 12 so 0 is considered 12
+		h = 12;
+	}
+	m = m % 60;//make sure time doesn't go overboard
+	s = s % 60;//make sure time doesn't go overboard
+	string hr = twoDigitString(h);//makes sure it is read in two digits
+	string min = twoDigitString(m);//makes sure it is read in two digits
+	string sec = twoDigitString(s);//makes sure it is read in two digits
+	string all = hr + ":" + min + ":" + sec + tim;//bunch time in one string
+	return all;	// return hh:mm:ss A M or hh:mm:ss P M
+}
+unsigned int getMenuChoice(unsigned int maxChoice) {
+	unsigned int i;
+	cin >> i;//read user choice
+	while ((i <= 0) && (i > maxChoice)) {//makes sure it fits within the bounds
+		cin >> i;//if it doesn't fit make them do it right 
+	}
+	if (i == 4) {//choose 4 means exit
+		go = 0;// make go = 0 which can be used in main
+	}
+	return i;//return the choice
+}
+void displayClocks(unsigned int h, unsigned int m, unsigned int s) {
+	cout << nCharString(27, '*') << "   " << nCharString(27, '*') << "\n";//formatting
+	cout << "*" << nCharString(6, ' ') << "12-HOUR CLOCK" << nCharString(6, ' ') << "*" << nCharString(3, ' ');//formatting
+	cout << "*" << nCharString(6, ' ') << "24-HOUR CLOCK" << nCharString(6, ' ') << "*" << "\n";//formatting
+	cout << "\n";//formatting
+	cout << "*" << nCharString(6, ' ') << formatTime12(h, m, s) << nCharString(7, ' ') << "*" << nCharString(3, ' ');//formatting and show 12 hour time
+	cout << "*" << nCharString(8, ' ') << formatTime24(h, m, s) << nCharString(9, ' ') << "*" << "\n";//formatting and show 24 hour time
+	cout << nCharString(27, '*') << "   " << nCharString(27, '*') << "\n";//formatting
+}
+void mainMenu() {
+	int n;
+	n = getMenuChoice(4);//gets the choice from user between one and 4 if 4 end program
+	if (n == 1) {
+		addOneHour();//add an hour
+	}
+	else if (n == 2) {
+		addOneMinute();//add a minute
+	}
+	else if (n == 3) {
+		addOneSecond();//add a second
+	}
+	else if (n == 4) {
+		go = 0;// tell the loop to stop in main
+	}
+}
+void addOneHour() {
+	if ((hours >= 0) && (hours <= 22)) {//checks to make sure it doesn't go overboard
+		hours++;//add an hour
+	}
+	else if (hours == 23) {//loops time back around
+		hours = 0;//set hour back at 0
+	}
+}
+void addOneMinute() {
+	if ((minutes >= 0) && (minutes <= 58)) {//checks to make sure it doesn't go overboard
+		minutes++;//add a minute
+	}
+	else if (minutes == 59) {//loops time back around
+		minutes = 0;//set back minutes to 0
+		addOneHour();//add an hour
+	}
+}
+void addOneSecond() {
+	if ((seconds >= 0) && (seconds <= 58)) {//checks to make sure it doesn't go overboard
+		seconds++;//add a second
+	}
+	else if (seconds == 59) {//loops time back around
+		seconds = 0;//set seconds back at 0
+		addOneMinute();//add a minute
+	}
+}
